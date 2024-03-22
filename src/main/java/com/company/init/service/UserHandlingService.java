@@ -6,6 +6,7 @@ import com.company.init.advice.UserNotFoundException;
 import com.company.init.mapper.UserDTOMapper;
 import com.company.init.mapper.UserDTOMapperImplementation;
 import com.company.init.mapper.UserMapper;
+import com.company.init.validation.UserDataValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,9 @@ public class UserHandlingService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserDataValidation userDataValidation;
 
     @Autowired
     private UserDTOMapperImplementation userDTOMapperImplementation;
@@ -67,28 +71,34 @@ public class UserHandlingService {
     }
 
     public ResponseEntity<String> insertUserData(UserDTO userDTO) throws SqlDuplicationException {//adding the user details in the database by validating some constraints
-        User user = userDTOMapperImplementation.dtoToModel(userDTO);
-        try {
-            int status = userMapper.insert(user);
-            if (status == 1) {
-                return ResponseEntity.status(HttpStatus.CREATED)
-                        .body("User data added successfully");
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("error in storing the data");
-            }
-            //handling if duplicate username in added
-        } catch (DataIntegrityViolationException e) {
+        if(userDataValidation.checkUsername(userDTO.getUsername())&& userDataValidation.checkEmail(userDTO.getEmail())&& userDataValidation.checkVerifiedDepartment(userDTO.getDepartment())){
+            User user = userDTOMapperImplementation.dtoToModel(userDTO);
+            try {
+                int status = userMapper.insert(user);
+                if (status == 1) {
+                    return ResponseEntity.status(HttpStatus.CREATED)
+                            .body("User data added successfully");
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body("error in storing the data");
+                }
+                //handling if duplicate username in added
+            } catch (DataIntegrityViolationException e) {
 //            try {
                 throw new SqlDuplicationException("error in storing the data");
 //            } catch (SqlDuplicationException ex) {
 //                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 //                        .body("username is Duplicate retry with another name");
 //            }
-        } catch (Exception e) {
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("username is invalid retry with another name");
+            }
+        }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("username is invalid retry with another name");
+                    .body("The Details you have entered is invalid!!! kindly check it");
         }
+
 
     }
 }
