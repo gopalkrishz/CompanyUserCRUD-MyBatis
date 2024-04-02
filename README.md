@@ -1,0 +1,1 @@
+this project include developent of REST API for the company users using Spring MVC stack and Spring Boot and Maven as a build tool.This is a fully functioning api that returns a ResponseEntity for each request(CRUD request). 
