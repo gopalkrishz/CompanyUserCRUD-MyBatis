@@ -12,7 +12,7 @@ public interface UserMapper {
     public List<User> findAllUser();
 
     @Select("select * from users where username = #{username}")
-    public List<User> findUserByName(String username);
+    public User findUserByName(String username);
 
     @Select("select * from users where department = #{department}")
     public List<User> findUserByDepartment(String department);

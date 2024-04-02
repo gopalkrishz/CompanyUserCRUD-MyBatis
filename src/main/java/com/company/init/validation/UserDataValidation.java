@@ -45,7 +45,7 @@ public class UserDataValidation {
 
     public Boolean checkVerifiedDepartment(String department) {
         // List of allowed departments
-        List<String> allowedDepartments = Arrays.asList("it", "production", "devops", "developer", "hr", "sre");
+        List<String> allowedDepartments = Arrays.asList("it", "production", "devops", "developer", "hr", "sre","backend");
 
         // Convert department to lowercase for case-insensitive comparison
         String lowercaseDepartment = department.toLowerCase();

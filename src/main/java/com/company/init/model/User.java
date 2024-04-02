@@ -1,7 +1,5 @@
 package com.company.init.model;
-
 import lombok.Data;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -10,11 +8,14 @@ import java.util.Objects;
 
 public class User {
 
+
     private int id;
     private String username;
     private String email;
     private String department;
+    @NotBlank(message = "salary value is needed")
     private String role;
+
     private int salary;
     public User() {
     }
@@ -39,7 +40,7 @@ public class User {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(String username)     {
         this.username = username;
     }
 

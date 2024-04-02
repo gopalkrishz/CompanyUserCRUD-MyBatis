@@ -3,7 +3,6 @@ package com.company.init.service;
 import com.company.init.DTO.UserDTO;
 import com.company.init.advice.SqlDuplicationException;
 import com.company.init.advice.UserNotFoundException;
-import com.company.init.mapper.UserDTOMapper;
 import com.company.init.mapper.UserDTOMapperImplementation;
 import com.company.init.mapper.UserMapper;
 import com.company.init.validation.UserDataValidation;
@@ -21,21 +20,21 @@ import java.util.List;
 public class UserHandlingService {
 
     @Autowired
-    private UserMapper userMapper;
+    public UserMapper userMapper;
 
     @Autowired
-    private UserDataValidation userDataValidation;
+    public UserDataValidation userDataValidation;
 
     @Autowired
-    private UserDTOMapperImplementation userDTOMapperImplementation;
+    public UserDTOMapperImplementation userDTOMapperImplementation;
 
     public List<User> getAllTheUserDetails(){//get all the user details from the database
         return userMapper.findAllUser();
     }
 
-    public List<User> getUserByNameService(String username){// get the user details by name
-        List<User> user = userMapper.findUserByName(username);
-        if(user.isEmpty()){
+    public User getUserByNameService(String username){// get the user details by name
+        User user = userMapper.findUserByName(username);
+        if(user==null){
             throw new UserNotFoundException("The searched user was not found in the database kindly use with another name");
         }
         return user;
@@ -48,57 +47,46 @@ public class UserHandlingService {
         }
         return user;
     }
-
-    public String updateUserByIdService(int id,UserDTO userDTO){//update the user details by the user id
+    public int updateUserByIdService(int id,UserDTO userDTO){//update the user details by the user id
         User user=userDTOMapperImplementation.dtoToModel(userDTO);
         user.setId(id);
         int status = userMapper.update(user);
         if (status > 0) {
-            return "User updated successfully";
+            return 1;
         } else {
-            return "Failed to update user";
+            return 0;
         }
     }
-
-    public String deleteUserByIdService(int id){//delete the user by user id
+    public int deleteUserByIdService(int id){//delete the user by user id
         int status = userMapper.delete(id);
         if(status>0){
-            return "user deleted successfully";
+            return 1;
         }
         else{
-            return "error in deletion of the user can you please check the id";
+            return 0;
         }
     }
 
-    public ResponseEntity<String> insertUserData(UserDTO userDTO) throws SqlDuplicationException {//adding the user details in the database by validating some constraints
+    public String insertUserData(UserDTO userDTO) throws SqlDuplicationException {//adding the user details in the database by validating some constraints
         if(userDataValidation.checkUsername(userDTO.getUsername())&& userDataValidation.checkEmail(userDTO.getEmail())&& userDataValidation.checkVerifiedDepartment(userDTO.getDepartment())){
             User user = userDTOMapperImplementation.dtoToModel(userDTO);
             try {
                 int status = userMapper.insert(user);
                 if (status == 1) {
-                    return ResponseEntity.status(HttpStatus.CREATED)
-                            .body("User data added successfully");
+                    return "User data added successfully";
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body("error in storing the data");
+                    return "error in storing the data";
                 }
                 //handling if duplicate username in added
             } catch (DataIntegrityViolationException e) {
 //            try {
                 throw new SqlDuplicationException("error in storing the data");
-//            } catch (SqlDuplicationException ex) {
-//                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                        .body("username is Duplicate retry with another name");
 //            }
             } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("username is invalid retry with another name");
+                return "username is invalid retry with another name";
             }
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("The Details you have entered is invalid!!! kindly check it");
+            return "The Details you have entered is invalid!!! kindly check it";
         }
-
-
     }
 }

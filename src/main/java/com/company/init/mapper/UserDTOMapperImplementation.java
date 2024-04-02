@@ -5,8 +5,8 @@ import com.company.init.model.User;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDTOMapperImplementation implements UserDTOMapper{
-    @Override
+public class UserDTOMapperImplementation{
+
     public UserDTO modelToDTO(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
@@ -18,7 +18,7 @@ public class UserDTOMapperImplementation implements UserDTOMapper{
         return userDTO;
     }
 
-    @Override
+
     public User dtoToModel(UserDTO userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
